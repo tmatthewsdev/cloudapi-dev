@@ -61,4 +61,15 @@ class Controller_Servers extends Controller_Base
 		return Response::forge(View::forge('servers/details', ['server' => $rs->server_details($id)]));
 	}
 
+
+	public function get_flavors()
+	{
+		$rs = new Model_Rackspace;
+
+		return Response::forge(View::forge('flavors/index', ['flavors' => $rs->get_flavors()]));
+	}
+
+
+	
+
 }

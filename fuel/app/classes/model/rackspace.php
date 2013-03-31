@@ -1,8 +1,14 @@
 <?php
 
+use \Rackspace\Model\Server;
+use \Rackspace\Model\Flavor;
+
 class Model_Rackspace extends Model
 {
 
+	/**
+	 *
+	 */
 	public function __construct()
 	{
 		$token   = Session::get('rs_token_id');
@@ -20,6 +26,10 @@ class Model_Rackspace extends Model
 		}
 	}
 
+
+	/**
+	 *
+	 */
 	private function authenticate()
 	{
 		$username = 'tmatthewsdev';
@@ -44,6 +54,10 @@ class Model_Rackspace extends Model
 
 	}
 
+
+	/**
+	 *
+	 */
 	private function http_client()
 	{
 		return new \Guzzle\Http\Client('https://dfw.servers.api.rackspacecloud.com/v2/{account}', array(
@@ -52,6 +66,9 @@ class Model_Rackspace extends Model
 	}
 
 
+	/**
+	 *
+	 */
 	public function create_server()
 	{	
 		// curl https://dfw.servers.api.rackspacecloud.com/v2/$account/servers \
@@ -60,11 +77,35 @@ class Model_Rackspace extends Model
 		//       -H "Content-Type: application/json" \
 		//       -H "Accept: application/json" \
 		//       -H "X-Auth-Token: $token" \
-		//       -d '{"server": {"name": "my_server_with_network", "imageRef": "d42f821e-c2d1-4796-9f07-af5ed7912d0e", "flavorRef": "2", "max_count": 1, "min_count": 1, "networks": [{"uuid": "538a112a-34d1-47ff-bf1e-c40639e886e2"}, {"uuid": "00000000-0000-0000-0000-000000000000"}, {"uuid": "11111111-1111-1111-1111-111111111111"}]}}' \
+		//       -d '{"server": {
+		// "name": "my_server_with_network", 
+		// "imageRef": "d42f821e-c2d1-4796-9f07-af5ed7912d0e", 
+		// "flavorRef": "2", 
+		// "max_count": 1, 
+		// "min_count": 1,
+		// "networks": [{"uuid": "538a112a-34d1-47ff-bf1e-c40639e886e2"}, {"uuid": "00000000-0000-0000-0000-000000000000"}, {"uuid": "11111111-1111-1111-1111-111111111111"}]}}' \
 		//      | python -m json.tool
+		$response = $this->http_client()->post('servers', array(
+			'X-Auth-Token' => $this->token,
+		), array(
+			'server' => array(
+				'name'      => 'server_name',
+				'imageRef'  => '',
+				'flavorRef' => '',
+				'max_count' => '',
+				'min_count' => '',
+				'networks'  => array(),
+			)
+		))->send();
+
+		$response_body = json_decode($response->getBody(true));
 
 	}
 
+
+	/**
+	 *
+	 */
 	public function list_servers()
 	{
 		$response = $this->http_client()->get('servers/detail', array(
@@ -76,13 +117,16 @@ class Model_Rackspace extends Model
 		$servers = array();
 		foreach ($response_body->servers as $server_info)
 		{
-			$server = new \Rackspace\Model\Server($server_info);
+			$server = new Server($server_info);
 			array_push($servers, $server);
 		}
 		return $servers;
 	}
 
 
+	/**
+	 *
+	 */
 	public function server_details($id)
 	{
 		$response = $this->http_client()->get("servers/{$id}", array(
@@ -90,6 +134,34 @@ class Model_Rackspace extends Model
 		))->send();
 
 		$response_body = json_decode($response->getBody(true));
-		return new \Rackspace\Model\Server($response_body->server);
+		return new Server($response_body->server);
 	}
+
+
+	/**
+	 *
+	 */
+	public function get_flavors()
+	{
+		$response = $this->http_client()->get("flavors/detail", array(
+			'X-Auth-Token' => $this->token,
+		))->send();
+
+		$response_body = json_decode($response->getBody(true));
+		
+
+		//var_export($response_body);
+
+
+		$flavors = array();
+		foreach ($response_body->flavors as $flavor_info)
+		{
+			$flavor = new Flavor($flavor_info);
+			array_push($flavors, $flavor);
+		}
+		return $flavors;
+	}
+
+
+	
 }

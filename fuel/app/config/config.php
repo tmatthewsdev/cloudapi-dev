@@ -169,6 +169,7 @@ return array(
 			'Fuel\\Core\\ViewModel',
 			'Closure',
 			'Rackspace\\Model\\Server',
+			'Rackspace\\Model\\Flavor',
 		),
 	),
 
