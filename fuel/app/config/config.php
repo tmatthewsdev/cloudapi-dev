@@ -170,6 +170,7 @@ return array(
 			'Closure',
 			'Rackspace\\Model\\Server',
 			'Rackspace\\Model\\Flavor',
+			'Rackspace\\Model\\Image',
 		),
 	),
 
